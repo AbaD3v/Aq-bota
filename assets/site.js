@@ -179,20 +179,34 @@ function setMobileMenu(open) {
   toggle.setAttribute("aria-label", tr(content.labels[open ? "close" : "menu"]));
   toggle.innerHTML = icon(open ? "close" : "menu");
 }
-function whatsapp(caption = content.home.secondary) {
+function whatsappUrl() {
   const n = content.contacts.whatsapp;
+  if (!/^[1-9]\d{7,14}$/.test(n)) return "";
   const message = tr(content.contacts.waMessage).trim();
-  if (/^[1-9]\d{7,14}$/.test(n))
+  return "https://wa.me/" + n + (message ? "?text=" + encodeURIComponent(message) : "");
+}
+function whatsapp(caption = content.home.secondary) {
+  const href = whatsappUrl();
+  if (href)
     return (
-      '<a class="button light" rel="noreferrer noopener" target="_blank" href="https://wa.me/' +
-      n +
-      (message ? "?text=" + encodeURIComponent(message) : "") +
-      '">' +
+      `<a class="button light" rel="noreferrer noopener" target="_blank" href="${href}">` +
       icon("wa") +
       t(caption) +
       "</a>"
     );
   return '<button class="button light" data-action="wa">' + icon("wa") + t(caption) + "</button>";
+}
+function updateFloatingWhatsApp() {
+  const shortcut = document.getElementById("whatsapp-fab");
+  if (!shortcut) return;
+  const href = whatsappUrl();
+  shortcut.hidden = !href;
+  if (!href) return;
+  const caption = tr(content.contacts.chatLabel) || tr(content.home.secondary) || "WhatsApp";
+  shortcut.href = href;
+  shortcut.title = caption;
+  shortcut.setAttribute("aria-label", caption);
+  if (!shortcut.firstElementChild) shortcut.innerHTML = icon("wa");
 }
 function clubShowcase() {
   const clubs = content.items.clubs;
@@ -1727,6 +1741,7 @@ function render() {
   if (dialog.open) dialog.close();
   renderHeader();
   document.querySelector("#footer").innerHTML = footer();
+  updateFloatingWhatsApp();
   document.querySelector("#skip").textContent = tr(content.labels.skip);
   const route = page + "/" + record;
   const changedRoute = lastRoute !== route;
