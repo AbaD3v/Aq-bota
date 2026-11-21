@@ -1179,13 +1179,38 @@ function photoGrid(rows, offset = 0) {
     )
     .join("")}</div>`;
 }
+const galleryAlbums = {
+  "album.places": { id: "places", label: "placesAlbum" },
+  "album.activities": { id: "activities", label: "activitiesAlbum" }
+};
+const initialActivityGroups = {
+  "activity-paper-shapes": "altyn-saka",
+  "activity-apple-shapes": "altyn-saka",
+  "activity-number-six": "erketai",
+  "activity-count-to-five": "erketai",
+  "activity-loops": "erketai"
+};
+function galleryAlbum(photo) {
+  if (photo.album !== undefined) return photo.album;
+  if (photo.id?.startsWith("activity-")) return "activities";
+  if (photo.id?.startsWith("aqb-")) return "places";
+  return "";
+}
 function galleryPhotos(groupId = "") {
   const { gallery, groups, clubs } = content.items;
+  if (Object.hasOwn(galleryAlbums, groupId)) {
+    const album = galleryAlbums[groupId].id;
+    return gallery.filter(photo => galleryAlbum(photo) === album);
+  }
   const groupPhotos = groups
     .filter((group) => !groupId || group.id === groupId)
     .flatMap((group) => group.photos || []);
   const matches = (photo) => !groupId || photo.groupId === groupId;
-  const galleryRows = gallery.filter(matches);
+  // Older published snapshots gain the initial album assignment without replacing live edits.
+  const galleryRows = gallery.filter(photo => {
+    const initialGroup = photo.album === undefined ? initialActivityGroups[photo.id] : "";
+    return !groupId || (photo.groupId || initialGroup) === groupId;
+  });
   const clubPhotos = clubs.flatMap((club) => (club.photos || []).filter(matches));
   return groupId
     ? [...groupPhotos, ...galleryRows, ...clubPhotos]
@@ -1193,6 +1218,9 @@ function galleryPhotos(groupId = "") {
 }
 function galleryText(key) {
   const defaults = {
+    placesAlbum: { ru: "Садик и двор", kk: "Балабақша мен аула" },
+    activitiesAlbum: { ru: "Занятия", kk: "Сабақтар" },
+    albumsLabel: { ru: "Альбомы", kk: "Альбомдар" },
     wallMode: { ru: "Все фото", kk: "Барлық фото" },
     stackMode: { ru: "Листать", kk: "Парақтау" },
     viewLabel: { ru: "Режим просмотра", kk: "Көру режимі" },
@@ -1405,8 +1433,10 @@ function galleryPage(p) {
 }
 function galleryView(p) {
   const options = [["", t(p.allPhotos) || pageName("gallery")],
+    ...Object.entries(galleryAlbums).map(([id, album]) => [id, esc(galleryText(album.label))]),
     ...content.items.groups.map(group => [group.id, t(group.title)])];
-  const filterLabel = t(p.filterLabel) || pageName("groups");
+  const oldLabel = !p.placesAlbum && ["Выберите группу", "Топты таңдаңыз"].includes(tr(p.filterLabel));
+  const filterLabel = (!oldLabel && t(p.filterLabel)) || esc(galleryText("albumsLabel"));
   const filters = options.map(([id, title]) =>
     `<a href="${link("gallery", id)}"${id === record ? ' aria-current="page"' : ""}>${title}</a>`).join("");
   const photos = galleryPhotos(record);
@@ -1637,7 +1667,8 @@ function inside() {
     body = "",
     crumb = pageName(page);
   if (page === "gallery") {
-    if (record && !content.items.groups.some((group) => group.id === record)) return missing();
+    if (record && !Object.hasOwn(galleryAlbums, record) &&
+        !content.items.groups.some((group) => group.id === record)) return missing();
     return pageFrame(crumb, `<div id="gallery-body">${galleryPage(p)}</div>`);
   } else if (record) {
     const row = content.items[page]?.find((r) => r.id === record);
@@ -1718,13 +1749,17 @@ function render() {
     record && ["groups", "clubs", "gallery", "news", "documents"].includes(page)
       ? content.items[page === "gallery" ? "groups" : page].find((row) => row.id === record)
       : null;
+  const galleryAlbumTitle = page === "gallery" && Object.hasOwn(galleryAlbums, record)
+    ? galleryText(galleryAlbums[record].label)
+    : "";
+  const sectionTitle = galleryAlbumTitle || tr(content.pages[page]?.nav);
   document.title =
     (profile
       ? (page === "gallery" ? tr(content.pages.gallery.nav) + " · " : "") +
         tr(profile.title) +
         " · "
-      : content.pages[page]
-        ? tr(content.pages[page].nav) + " · "
+      : sectionTitle
+        ? sectionTitle + " · "
         : "") +
     tr(content.brand.name) +
     " · " +
