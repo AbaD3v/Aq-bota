@@ -85,12 +85,17 @@ function navLink(p, symbol = "") {
     "</a>"
   );
 }
+function brandLogo() {
+  const path = asset(content.brand.logo);
+  return path === "assets/brand.svg" ? "assets/brand.svg?v=2" : path;
+}
 function brand() {
+  const logo = brandLogo();
   return (
     '<a class="brand" href="' +
     link("home") +
     '">' +
-    art(content.brand.logo) +
+    (logo ? `<img src="${logo}" alt="" decoding="async">` : "") +
     "<span><strong>" +
     t(content.brand.name) +
     "</strong><small>" +
@@ -1713,7 +1718,7 @@ function render() {
   document.querySelector('meta[name="description"]').content =
     (page === "clubs" ? tr(profile?.body) : tr(profile?.summary)) ||
     tr(content.pages[page]?.lead || content.home.summary);
-  const brandIcon = asset(content.brand.logo);
+  const brandIcon = brandLogo();
   if (brandIcon) {
     const favicon = document.querySelector('link[rel="icon"]');
     favicon.removeAttribute("type");
