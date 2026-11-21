@@ -541,42 +541,46 @@ function bindHomeJumpBar(bar, motion) {
 
 function bindHomeParallax(motion) {
   const scenes = [...main.querySelectorAll(".depth-photo")].map(photo => ({
-    photo, frame: photo.parentElement,
+    photo, window: photo.parentElement,
     hero: photo.parentElement.classList.contains("hero-window")
   }));
-  const strength = .52;
-  let frame = 0, measure = true, viewport;
-  function paint() {
+  let frame = 0, measure = true, lastTime = 0;
+
+  function paint(time) {
     frame = 0;
-    const scroll = window.scrollY;
-    // Section geometry only changes on resize or reflow. A swipe only updates transforms.
+    const scroll = Math.max(0, window.scrollY);
     if (measure) {
       measure = false;
-      viewport = window.innerHeight;
       for (const scene of scenes) {
-        const bounds = scene.frame.getBoundingClientRect();
-        scene.top = bounds.top + scroll;
-        scene.height = bounds.height;
-        scene.travel = Math.min(bounds.height, viewport) * .30;
-        const extra = scene.hero ? Math.max(0, scene.top) * strength : 2 * scene.travel;
-        scene.extra = Math.ceil(extra) + 2 + "px";
+        const height = scene.window.offsetHeight;
+        const bleed = Number(getComputedStyle(scene.window).getPropertyValue("--depth-overscan"));
+        scene.anchor = layoutTop(scene.window) - (scene.hero ? 0 : height * .55);
+        scene.range = Math.max(1, height * .48);
+        scene.travel = Math.max(0, height * bleed - 2);
       }
     }
+
+    const elapsed = lastTime ? Math.min(50, time - lastTime) : 16.7;
+    const blend = 1 - Math.exp(-elapsed / 42);
+    let settling = false;
     for (const scene of scenes) {
-      const { photo, top, height, hero, travel, extra } = scene;
-      const relativeTop = top - Math.max(0, scroll);
-      if (!height || relativeTop + height <= 0 || relativeTop >= viewport) continue;
-      const distance = (viewport - height) / 2 - relativeTop;
-      // Ease out near the screen edges so the framed subject remains in view.
-      const shift = hero ? -relativeTop * strength : travel * Math.tanh(distance * strength / travel);
-      if (photo.style.getPropertyValue("--depth-extra") !== extra) photo.style.setProperty("--depth-extra", extra);
-      const offset = shift.toFixed(1);
+      // Use the cover's document position so mobile browser chrome cannot move the photo.
+      const target = scene.travel * Math.tanh((scroll - scene.anchor) / scene.range);
+      const previous = scene.shift ?? target;
+      const delta = target - previous;
+      const moving = Math.abs(delta) > .2;
+      scene.shift = moving ? previous + delta * blend : target;
+      settling ||= moving;
+      const offset = scene.shift.toFixed(2);
       if (scene.renderedOffset !== offset) {
         scene.renderedOffset = offset;
-        photo.style.transform = `translate3d(0,${offset}px,0)`;
+        scene.photo.style.transform = `translate3d(0,${offset}px,0)`;
       }
     }
+    lastTime = settling ? time : 0;
+    if (settling) schedule();
   }
+
   function schedule() {
     if (!frame && motion.matches) frame = requestAnimationFrame(paint);
   }
@@ -590,10 +594,11 @@ function bindHomeParallax(motion) {
     resize?.disconnect();
     cancelAnimationFrame(frame);
     frame = 0;
+    lastTime = 0;
     for (const scene of scenes) {
+      scene.shift = undefined;
       scene.renderedOffset = undefined;
       scene.photo.style.removeProperty("transform");
-      scene.photo.style.removeProperty("--depth-extra");
     }
   }
   const resize = "ResizeObserver" in window ? new ResizeObserver(layoutChanged) : null;
@@ -605,8 +610,8 @@ function bindHomeParallax(motion) {
     window.addEventListener("resize", layoutChanged);
     resize?.observe(document.getElementById("header"));
     for (const section of main.children) resize?.observe(section);
-    for (const scene of scenes) resize?.observe(scene.frame);
-    paint();
+    for (const scene of scenes) resize?.observe(scene.window);
+    paint(performance.now());
   }
   refresh();
   motion.addEventListener("change", refresh);

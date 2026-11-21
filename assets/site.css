@@ -2832,10 +2832,6 @@ dialog:has(.lightbox) .modal-close {
   from { opacity: .58; translate: 0 14px; scale: .985; }
   to { opacity: 1; translate: 0 0; scale: 1; }
 }
-@keyframes page-cover-in {
-  from { opacity: .78; scale: 1.045; }
-  to { opacity: 1; scale: 1; }
-}
 @keyframes draw-underline {
   from { scale: .08 1; opacity: .2; }
   to { scale: 1 1; opacity: .68; }
@@ -2875,9 +2871,6 @@ dialog:has(.lightbox) .modal-close {
   }
   .page-arrival :is(.directory-art, .heading-art, .profile-intro > .hero-art, .album-emblem) {
     animation: page-picture-in 430ms var(--ease-settle) 95ms backwards;
-  }
-  .page-arrival .hero-window .depth-photo {
-    animation: page-cover-in 630ms var(--ease-settle);
   }
   .page-arrival .hero h1 em::after {
     animation: draw-underline 470ms var(--ease-settle) 120ms backwards;
@@ -3088,10 +3081,11 @@ dialog:has(.lightbox) .modal-close {
   font-size: 1.12rem;
 }
 @media screen and (prefers-reduced-motion: no-preference) {
-  img.depth-photo { height: calc(100% + var(--depth-extra, 0px)); }
-  .depth-window:not(.hero-window) .depth-photo {
-    top: 50%;
-    translate: 0 -50%;
+  .depth-window { --depth-overscan: .20; }
+  .depth-window .depth-photo {
+    /* Reserve motion space before the photo is visible. Scrolling only translates the layer. */
+    inset: calc(-100% * var(--depth-overscan)) 0 auto;
+    height: calc(100% + 200% * var(--depth-overscan));
   }
 }
 @media (max-width: 700px) {
