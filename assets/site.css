@@ -3574,15 +3574,18 @@ dialog:has(.gallery-lightbox) .modal-close { color: #294638; top: max(8px, env(s
   place-items: center;
   width: clamp(52px, 13vw, 60px);
   aspect-ratio: 1;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  background: #137451;
+  border: 1px solid #ffffff9e;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #218e5c, #106d4a);
   color: #fff;
-  box-shadow: 0 5px 17px #143b334d;
+  box-shadow: 0 6px 17px #1a433955, inset 0 1px 0 #ffffff38;
   -webkit-tap-highlight-color: transparent;
 }
-.whatsapp-fab svg { width: 58%; height: 58%; }
-.whatsapp-fab:hover, .whatsapp-fab:focus-visible { background: #0b6041; }
+.whatsapp-fab svg { width: 62%; height: 62%; stroke-width: 1.9; }
+.whatsapp-fab svg path:last-child { fill: currentColor; stroke: none; }
+.whatsapp-fab:not([hidden]):is(:hover, :focus-visible) {
+  background: linear-gradient(145deg, #197d50, #0e6242);
+}
 .whatsapp-fab:focus-visible { outline: 2px solid #173c30; outline-offset: 3px; }
 body:has(.mobile-toggle[aria-expanded="true"], .home-jump-picker[aria-expanded="true"], #dialog[open]) .whatsapp-fab {
   visibility: hidden;
@@ -3594,19 +3597,22 @@ body:has(.mobile-toggle[aria-expanded="true"], .home-jump-picker[aria-expanded="
 }
 @media (prefers-reduced-motion: no-preference) {
   .whatsapp-fab {
-    animation: whatsapp-appear 380ms var(--ease-settle) both;
-    transition: background-color 160ms ease, transform 180ms var(--ease-settle);
+    animation: whatsapp-appear 340ms var(--ease-settle) both;
+    transition: transform 180ms var(--ease-settle);
   }
-  .whatsapp-fab:active { transform: scale(.94); }
+  .whatsapp-fab:active { transform: scale(.93); }
+  .whatsapp-fab svg {
+    animation: whatsapp-wave 4.8s ease-in-out .38s infinite;
+  }
   .whatsapp-fab::after {
     content: "";
     position: absolute;
-    inset: -2px;
-    border: 2px solid #269976;
+    inset: -3px;
+    border: 2px solid #35a976;
     border-radius: inherit;
     opacity: 0;
     pointer-events: none;
-    animation: whatsapp-pulse 2.4s ease-out 750ms 2;
+    animation: whatsapp-pulse 4.8s ease-out .38s infinite;
   }
 }
 @keyframes whatsapp-appear {
@@ -3614,6 +3620,13 @@ body:has(.mobile-toggle[aria-expanded="true"], .home-jump-picker[aria-expanded="
   to { opacity: 1; translate: 0; }
 }
 @keyframes whatsapp-pulse {
-  0% { opacity: .48; scale: 1; }
-  72%, 100% { opacity: 0; scale: 1.38; }
+  0%, 100% { opacity: 0; transform: scale(1); }
+  4% { opacity: .78; }
+  25%, 99% { opacity: 0; transform: scale(1.32); }
+}
+@keyframes whatsapp-wave {
+  0%, 25%, 100% { transform: none; }
+  6% { transform: translateY(-2px) rotate(-15deg) scale(1.09); }
+  12% { transform: translateY(-1px) rotate(11deg) scale(1.04); }
+  18% { transform: rotate(-5deg); }
 }
