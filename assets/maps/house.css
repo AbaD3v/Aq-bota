@@ -1,0 +1,216 @@
+@font-face {
+  font-family: Nunito;
+  src: url("../fonts/nunito.ttf") format("truetype");
+  font-display: swap;
+}
+html,
+body,
+#plan {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: Nunito, system-ui, sans-serif;
+}
+#plan {
+  flex: 1;
+  min-height: 0;
+  background: #eff0e4;
+  color: #233e35;
+  font-family: Nunito, system-ui, sans-serif;
+}
+.leaflet-tooltip {
+  font-family: inherit;
+}
+.map-label {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  pointer-events: none;
+}
+.map-label::before {
+  display: none;
+}
+.street-name {
+  display: block;
+  padding: 1px 4px;
+  color: #684e22;
+  text-shadow:
+    0 1px 3px white,
+    0 -1px 3px #fff8db;
+  font-size: clamp(12px, 3vw, 15px);
+  font-weight: 800;
+}
+.house-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 23px;
+  min-height: 23px;
+  box-sizing: border-box;
+  color: white;
+  background: #265a48;
+  border: 1.5px solid white;
+  padding: 0 4px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px #25473359;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 850;
+}
+.house-marker {
+  display: grid;
+  place-items: center;
+}
+.house-marker:focus-visible {
+  outline: 2px solid #173d32;
+  outline-offset: 2px;
+}
+.house-badge {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+.entrance-label {
+  position: absolute;
+  top: calc(100% + 2px);
+  width: max-content;
+  max-width: min(115px, 33vw);
+  padding: 3px 7px;
+  border: 1px solid #aabfaf;
+  border-radius: 9px;
+  background: #fffdf2;
+  color: #254c3a;
+  text-align: center;
+  font: 800 12px / 1.18 Nunito, sans-serif;
+  overflow-wrap: anywhere;
+  box-shadow: 0 1px 3px #2a433221;
+}
+.small-footprint .house-badge {
+  transform: translate(17px, -2px);
+}
+.site-name {
+  color: #204e40;
+  font-weight: 850;
+  font-size: 14px;
+  text-shadow:
+    0 1px 2px white,
+    1px 0 2px white,
+    -1px 0 2px white;
+}
+.leaflet-control-zoom {
+  border: 0 !important;
+  box-shadow: 0 1px 6px #243a3026;
+}
+.leaflet-control-zoom.leaflet-bar a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  color: #265a48;
+}
+.leaflet-control-attribution {
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+}
+.leaflet-control-attribution a {
+  color: #315b4c;
+}
+.landmark-marker {
+  display: grid;
+  place-items: center;
+}
+.landmark-dot {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 23px;
+  height: 23px;
+  padding-inline: 3px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #226288;
+  box-shadow: 0 0 0 1px #195477;
+  flex-shrink: 0;
+}
+.landmark-dot:empty {
+  min-width: 16px;
+  height: 16px;
+}
+.landmark-context .landmark-dot {
+  background: #778787;
+}
+.landmark-marker:focus-visible {
+  outline: 2px solid #195477;
+  border-radius: 50%;
+}
+#plan.picking {
+  cursor: crosshair;
+}
+#landmark-key {
+  border-top: 1px solid #d5dfda;
+  background: #fffef9;
+  max-height: 37%;
+  overflow: auto;
+}
+#landmark-key ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#landmark-key li + li {
+  border-top: 1px solid #e7ece9;
+}
+.landmark-heading {
+  padding: 5px 12px 0;
+}
+.landmark-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  color: #254b5f;
+  text-align: start;
+  font: inherit;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+button.landmark-entry {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+button.landmark-entry:hover {
+  background: #edf3f4;
+}
+button.landmark-entry[aria-haspopup="dialog"]::after {
+  content: "";
+  flex: 0 0 7px;
+  height: 7px;
+  margin-inline: auto 4px;
+  border-top: 2px solid #4e626b;
+  border-right: 2px solid #4e626b;
+  transform: rotate(45deg);
+}
+button.landmark-entry:focus-visible {
+  outline: 2px solid #226288;
+  outline-offset: -3px;
+}
+.landmark-heading,
+.landmark-note {
+  display: block;
+  font-size: 11px;
+  color: #4e626b;
+}
+.landmark-caption {
+  font-size: 14px;
+  font-weight: 800;
+}
