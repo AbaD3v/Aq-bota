@@ -3594,6 +3594,10 @@ body:has(.mobile-toggle[aria-expanded="true"], .home-jump-picker[aria-expanded="
   body:has(.whatsapp-fab:not([hidden])) #footer {
     padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
+  body:has(.whatsapp-fab:not([hidden])) #gallery-view .album-controls {
+    padding-right: calc(61px + env(safe-area-inset-right));
+    gap: 8px;
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   .whatsapp-fab {
